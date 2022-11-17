@@ -12,26 +12,17 @@ from .setup import (
     HASHMAP,
     LINUXPATH,
     MAX_BYTE,
-    NEW_LINE,
     OVERFLOW_MESSAGE,
     REREAD
 )
 from .util import (
     add_new_line,
+    debug_message,
     default_exception,
     get_message,
     hash_file,
     load_file
 )
-
-def debug_message(**kwargs):
-    debug_str = ''
-
-    for key, value in kwargs.items():
-        debug_str += '\t {}: {}{}'.format(key, value, NEW_LINE)
-
-    logging.debug(debug_str)
-    return debug_str
 
 
 class ServerProtocol(asyncio.Protocol):
@@ -41,6 +32,14 @@ class ServerProtocol(asyncio.Protocol):
         self.transport = transport
 
     def get_bytes(self):
+        """
+        Called to get the memeory mapped file for lookup
+    
+        Returns:
+        bytes: bytes to be looked up
+    
+        """
+
         return load_file(LINUXPATH)
 
     def data_received(self, data):
@@ -49,10 +48,12 @@ class ServerProtocol(asyncio.Protocol):
 
         message = data
         try:
+            # Check for query overflow
             if (len(message) > MAX_BYTE):
                 raise ValueError('{} {}'\
                     .format(OVERFLOW_MESSAGE, MAX_BYTE))
 
+            # removes null and empty characters from string
             message = message.strip()
             logging.info('{} Data received: {!r}'\
                 .format(self.peername, message.decode(errors='ignore')))
@@ -64,16 +65,19 @@ class ServerProtocol(asyncio.Protocol):
 
             res_message = get_message(found_val)
 
+        # handle overflow exeption
         except ValueError as err:
             res_message = str(err)
             logging.error(res_message)
             res_message = ERROR_START+ ': ' + res_message
 
+        #handle other server errors
         except Exception:
             res_message = ERROR_MSG
             default_exception()
 
         finally:
+            # add debug messages to response
             res_message += DEBUG_START + debug_message(
                 IP_ADDRESS = self.peername[0],
                 PORT = self.peername[1],
@@ -88,14 +92,22 @@ class ServerProtocol(asyncio.Protocol):
                 .format(self.peername, res_message))
             self.transport.write(add_new_line(bytes(res_message, ENCODING)))
 
-            # logging.debug('Close the client socket')
-            # self.transport.close()
-
     def connection_lost(self, exc):
         logging.info('{} is disconnnected'.format(self.peername))
         return super().connection_lost(exc)
 
 async def serve(ip_address, port):
+    """
+    Starts and serves the asynchronous server
+
+    Parameters:
+    ip_address(string): IP Address to server the server
+    port(int): Port where server will be served
+
+    Returns:
+    None
+
+    """
 
     if not REREAD:
         m_file = load_file(LINUXPATH)

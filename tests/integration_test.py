@@ -45,6 +45,10 @@ logging.basicConfig(level=logging.DEBUG)
 done = found_str = not_found_str = received = actions = None
 
 class TestClientProtocol(asyncio.Protocol):
+    """
+    Base TestClient to be used for testing
+    """
+
     def __init__(self):
         super().__init__()
         self.transport = None
@@ -61,6 +65,14 @@ class TestClientProtocol(asyncio.Protocol):
         actions.append('open')
 
     def send_data(self):
+        """
+        Called to get the string to be sent to server
+    
+        Returns:
+        bytes: string to be sent to server
+    
+        """
+
         pass
 
     def data_received(self, data):
@@ -103,7 +115,10 @@ class IntegrationTestCases(unittest.TestCase):
         return super().setUp()
 
     def tearDown(self):
+        # close the curent event loop
         self.loop.close()
+
+        # create a new event loop and make it the current event loop
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
@@ -151,7 +166,7 @@ class IntegrationTestCases(unittest.TestCase):
     def test_reread_not_found_success(self):
         self.run_connection(self.get_output_client(found_str))
 
-        # Test that all recieved data matches expected output
+        """Test that all recieved data matches expected output"""
         self.assertIn(FOUND_MESSAGE, received.decode())
         self.assert_order()
 
@@ -161,7 +176,7 @@ class IntegrationTestCases(unittest.TestCase):
 
         self.run_connection(self.get_output_client(not_found_str))
 
-        # Test that all recieved data matches expected output
+        """Test that all recieved data matches expected output"""
         self.assertIn(NOT_FOUND_MESSAGE, received.decode())
         self.assert_order()
 
@@ -171,7 +186,7 @@ class IntegrationTestCases(unittest.TestCase):
 
         self.run_connection(self.get_output_client(b'ab'*513))
 
-        # Test that all recieved data matches expected output
+        """Test that all recieved data matches expected output"""
         self.assertIn('ab'*3, received.decode())
         self.assert_order()
 

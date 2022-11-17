@@ -15,7 +15,10 @@ from as_tcp import (
     HASHMAP,
     hash_file,
     is_empty,
-    add_new_line
+    add_new_line,
+    get_message,
+    NOT_FOUND_MESSAGE,
+    FOUND_MESSAGE
 )
 
 config = configparser.ConfigParser()
@@ -27,6 +30,7 @@ class UnitTestCases(unittest.TestCase):
     def setUp(self):
         self.file_path = TEST_FILE_PATH
         return super().setUp()
+
     """
     Test that file is successfuly read and loaded to memory
     """
@@ -78,6 +82,18 @@ class UnitTestCases(unittest.TestCase):
         """test for not empty case"""
         expected = is_empty(b'algosciences')
         self.assertEqual(expected, False)
+
+    """
+    Test get message function
+    """
+    def test_get_message_success(self):
+        """Test when value < 0"""
+        expected = get_message(-1)
+        self.assertEqual(expected, NOT_FOUND_MESSAGE)
+
+        """Test when value > 0"""
+        expected = get_message(1)
+        self.assertEqual(expected, FOUND_MESSAGE)
 
     """
     Test function add new line

@@ -48,6 +48,15 @@ def get_message(value):
 def add_new_line(word):
     return word + bytes(NEW_LINE, ENCODING)
 
+def debug_message(**kwargs):
+    debug_str = ''
+
+    for key, value in kwargs.items():
+        debug_str += '\t {}: {}{}'.format(key, value, NEW_LINE)
+
+    logging.debug(debug_str)
+    return debug_str
+
 def default_exception():
     # Get current system exception
     ex_type, ex_value, ex_traceback = sys.exc_info()
