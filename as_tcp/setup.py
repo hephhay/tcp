@@ -2,7 +2,7 @@ import configparser
 import logging
 from collections import defaultdict
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 
 config = configparser.ConfigParser()
 config.read('config.ini')

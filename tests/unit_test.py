@@ -5,6 +5,7 @@ import pathlib
 import sys
 import unittest
 
+# set package scope to as_tcp
 PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
 sys.path.append(PACKAGE_PATH)
 __package__ = PACKAGE_PATH
@@ -18,8 +19,11 @@ from as_tcp import (
     add_new_line,
     get_message,
     NOT_FOUND_MESSAGE,
-    FOUND_MESSAGE
+    FOUND_MESSAGE,
+    logging
 )
+
+logging.basicConfig(level=logging.DEBUG)
 
 config = configparser.ConfigParser()
 config.read('config.ini')

@@ -13,6 +13,17 @@ from .setup import (
 )
 
 def load_file(path):
+    """
+    loads file from path to memory
+
+    Parameters:
+    path(path): path to file location
+
+    Returns:
+    bytes: Memory mapped bytes of file
+
+    """
+
     with open(path, "r+b") as f:
         logging.debug('file opened successfully')
         # memory-map the file, size 0 means whole file and return
@@ -21,6 +32,17 @@ def load_file(path):
         return mfile
 
 def hash_file(mfile):
+    """
+    converts each line of a byte string to hashmap keys
+
+    Parameters:
+    mfile(bytes): bytes to be hash mapped
+
+    Returns:
+    None
+
+    """
+
     logging.debug('started hashing file')
 
     while True:
@@ -35,6 +57,17 @@ def hash_file(mfile):
     logging.debug('file hashed successfully')
 
 def is_empty(word):
+    """
+    check if byte is null
+
+    Parameters:
+    word(bytes): bytes to be checked
+
+    Returns:
+    bool: 'True' if byte is null and 'False' otherwise
+
+    """
+
     return True if word == b'' else False
 
 def get_message(value):
@@ -49,6 +82,17 @@ def add_new_line(word):
     return word + bytes(NEW_LINE, ENCODING)
 
 def debug_message(**kwargs):
+    """
+    gets server debug message
+
+    Parameters:
+    kwargs(**kwargs): key value pair containing debug tages and values
+
+    Returns:
+    string: debug message
+
+    """
+
     debug_str = ''
 
     for key, value in kwargs.items():
@@ -58,6 +102,14 @@ def debug_message(**kwargs):
     return debug_str
 
 def default_exception():
+    """
+    gracefull handling and logging of exceptions
+
+    Returns:
+    None
+
+    """
+
     # Get current system exception
     ex_type, ex_value, ex_traceback = sys.exc_info()
 

@@ -10,6 +10,7 @@ from timeit import default_timer as timer
 # third party libraries
 import serial_asyncio
 
+# set package scope to as_tcp
 PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
 sys.path.append(PACKAGE_PATH)
 __package__ = PACKAGE_PATH
@@ -22,10 +23,10 @@ from as_tcp import (
     REREAD,
     hash_file,
     load_file,
+    logging
 )
 
-# [found_str, not_found_str, b'ab'*513]
-# [FOUND_MESSAGE, NOT_FOUND_MESSAGE, OVERFLOW_MESSAGE]
+logging.basicConfig(level=logging.DEBUG)
 
 # track memory allocaton
 tracemalloc.start()
@@ -70,7 +71,7 @@ class TestClientProtocol(asyncio.Protocol):
     
         Returns:
         bytes: string to be sent to server
-    
+
         """
 
         pass
@@ -129,6 +130,17 @@ class IntegrationTestCases(unittest.TestCase):
         return super().tearDown()
 
     def run_connection(self, output_client):
+        """
+        start both the TCP client and server when called
+
+        Parameters:
+        output_client (TestClientProtocol): client class for testing
+    
+        Returns:
+        None
+
+        """
+
         # Setting up server
         coro = self.loop.create_server(TestServerProtocol, IP_ADRESS, PORT)
         self.loop.run_until_complete(coro)
@@ -150,6 +162,17 @@ class IntegrationTestCases(unittest.TestCase):
         self.loop.run_until_complete(asyncio.gather(*pending))
 
     def get_output_client(self, input_data):
+        """
+        Called to get the client class for testing
+
+        Parameters:
+        input_data (bytes): bytes string to be sent to the server
+
+        Returns:
+        TestClientProtocol: clent class for testing
+
+        """
+
         class OuputClient(TestClientProtocol):
             def send_data(self):
                 return input_data
@@ -163,6 +186,9 @@ class IntegrationTestCases(unittest.TestCase):
 
         self.assertEqual(actions, ['open', 'close'])
 
+    """
+    test for success when REREAD is True and query not in file
+    """
     def test_reread_not_found_success(self):
         self.run_connection(self.get_output_client(found_str))
 
@@ -170,6 +196,9 @@ class IntegrationTestCases(unittest.TestCase):
         self.assertIn(FOUND_MESSAGE, received.decode())
         self.assert_order()
 
+    """
+    test for success when REREAD is True and query is in file
+    """
     def test_reread_found_success(self):
         global REREAD
         REREAD = True
@@ -180,6 +209,9 @@ class IntegrationTestCases(unittest.TestCase):
         self.assertIn(NOT_FOUND_MESSAGE, received.decode())
         self.assert_order()
 
+    """
+    test for success when REREAD is True and query longer than 1024 bytes
+    """
     def test_reread_overflow_success(self):
         global REREAD
         REREAD = True
@@ -190,18 +222,27 @@ class IntegrationTestCases(unittest.TestCase):
         self.assertIn('ab'*3, received.decode())
         self.assert_order()
 
+    """
+    test for success when REREAD is False and query not in file
+    """
     def test_reread_false_found_success(self):
         global REREAD
         REREAD = False
 
         self.test_reread_found_success()
 
+    """
+    test for success when REREAD is False and query is in file
+    """
     def test_reread_false_not_found_success(self):
         global REREAD
         REREAD = False
 
         self.test_reread_not_found_success()
 
+    """
+    test for success when REREAD is False and query longer than 1024 bytes
+    """
     def test_reread_false_overflow_success(self):
         global REREAD
         REREAD = False
