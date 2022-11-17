@@ -15,7 +15,8 @@ from as_tcp import (
     HASHMAP,
     hash_file,
     is_empty,
-    add_new_line)
+    add_new_line
+)
 
 config = configparser.ConfigParser()
 config.read('config.ini')

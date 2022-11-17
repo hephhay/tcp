@@ -5,6 +5,7 @@ import sys
 import unittest
 import asyncio
 import tracemalloc
+from timeit import default_timer as timer
 
 # third party libraries
 import serial_asyncio
@@ -21,11 +22,10 @@ from as_tcp import (
     REREAD,
     hash_file,
     load_file,
-    OVERFLOW_MESSAGE
 )
 
-[found_str, not_found_str, b'ab'*513]
-[FOUND_MESSAGE, NOT_FOUND_MESSAGE, OVERFLOW_MESSAGE]
+# [found_str, not_found_str, b'ab'*513]
+# [FOUND_MESSAGE, NOT_FOUND_MESSAGE, OVERFLOW_MESSAGE]
 
 # track memory allocaton
 tracemalloc.start()
@@ -53,19 +53,20 @@ class TestClientProtocol(asyncio.Protocol):
         self.transport = transport
 
         # Send data to server
-        for data in self.send_data():
-            transport.write(data)
-            logging.debug('Data sent: {!r}'.format(data))
+        data = self.send_data()
+        transport.write(data)
+        logging.debug('Data sent: {!r}'.format(data))
 
         # sets the current action to opened connection
         actions.append('open')
 
     def send_data(self):
-        return [found_str, not_found_str, b'ab'*513]
+        pass
 
     def data_received(self, data):
         logging.debug('Data received: {!r}'.format(data.decode()))
-        received.append(data)
+        global received
+        received = data
 
     def connection_lost(self, exc):
         logging.debug('The server closed the connection')
@@ -73,7 +74,7 @@ class TestClientProtocol(asyncio.Protocol):
         # sets the current action to closed
         actions.append('close')
 
-        # 
+        # Notify Event loop abount connection ended
         done.set()
 
 class TestServerProtocol(ServerProtocol):
@@ -96,17 +97,15 @@ class IntegrationTestCases(unittest.TestCase):
         done = asyncio.Event()
         found_str = b'7;0;21;28;0;24;5;0;'
         not_found_str = b'algorithmic'
-        received = []
+        received = ''
         actions = []
-
-        # File Operation
-        if not REREAD:
-            hash_file(load_file(TEST_FILE_PATH))
 
         return super().setUp()
 
     def tearDown(self):
         self.loop.close()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
         # Unset Global Variables
         global done, found_str, not_found_str, received, actions
@@ -114,15 +113,19 @@ class IntegrationTestCases(unittest.TestCase):
 
         return super().tearDown()
 
-    def run_connection(self):
+    def run_connection(self, output_client):
         # Setting up server
         coro = self.loop.create_server(TestServerProtocol, IP_ADRESS, PORT)
         self.loop.run_until_complete(coro)
 
+        # Loading and hashing file
+        if not REREAD:
+            hash_file(load_file(TEST_FILE_PATH))
+
         # Setting up client
         client = serial_asyncio.create_serial_connection(
             self.loop,
-            TestClientProtocol,
+            output_client,
             CONN_STRING)
 
         # Start event Loop and wait till all event is done
@@ -131,21 +134,64 @@ class IntegrationTestCases(unittest.TestCase):
         pending = asyncio.all_tasks(self.loop)
         self.loop.run_until_complete(asyncio.gather(*pending))
 
-        # expected results
-        self.expected = map(
-            lambda val: val.encode(),
-            [FOUND_MESSAGE, NOT_FOUND_MESSAGE, OVERFLOW_MESSAGE]
-        )
+    def get_output_client(self, input_data):
+        class OuputClient(TestClientProtocol):
+            def send_data(self):
+                return input_data
 
-    def test_connection(self):
-        self.run_connection()
+        return OuputClient
+
+
+    def assert_order(self):
+        global REREAD
+        REREAD = True
+
+        self.assertEqual(actions, ['open', 'close'])
+
+    def test_reread_not_found_success(self):
+        self.run_connection(self.get_output_client(found_str))
 
         # Test that all recieved data matches expected output
-        for output, expected in zip(received, self.expected):
-            self.assertIn(expected, output)
+        self.assertIn(FOUND_MESSAGE, received.decode())
+        self.assert_order()
 
-        # Test that actions occur in the correct order
-        self.assertEqual(actions, ['open', 'close'])
+    def test_reread_found_success(self):
+        global REREAD
+        REREAD = True
+
+        self.run_connection(self.get_output_client(not_found_str))
+
+        # Test that all recieved data matches expected output
+        self.assertIn(NOT_FOUND_MESSAGE, received.decode())
+        self.assert_order()
+
+    def test_reread_overflow_success(self):
+        global REREAD
+        REREAD = True
+
+        self.run_connection(self.get_output_client(b'ab'*513))
+
+        # Test that all recieved data matches expected output
+        self.assertIn('ab'*3, received.decode())
+        self.assert_order()
+
+    def test_reread_false_found_success(self):
+        global REREAD
+        REREAD = False
+
+        self.test_reread_found_success()
+
+    def test_reread_false_not_found_success(self):
+        global REREAD
+        REREAD = False
+
+        self.test_reread_not_found_success()
+
+    def test_reread_false_overflow_success(self):
+        global REREAD
+        REREAD = False
+
+        self.test_reread_overflow_success()
 
 snapshot2 = tracemalloc.take_snapshot()
 
