@@ -20,6 +20,7 @@ dependencies = [
     "aiorun >= 2021.8.1",
     "pyserial >= 3.5",
     "pyserial-asyncio >= 0.6",
+    "python-daemon >= 2.3.0"
 ]
 
 
