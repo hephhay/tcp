@@ -6,9 +6,9 @@ import sys
 import unittest
 
 # set package scope to as_tcp
-PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
-sys.path.append(PACKAGE_PATH)
-__package__ = PACKAGE_PATH
+# PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
+# sys.path.append(PACKAGE_PATH)
+# __package__ = PACKAGE_PATH
 
 # Project Modules
 from as_tcp import (
@@ -29,6 +29,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 TEST_FILE_PATH = config['TEST'].get('filepath')
+
 
 class UnitTestCases(unittest.TestCase):
     def setUp(self):
@@ -104,8 +105,6 @@ class UnitTestCases(unittest.TestCase):
     """
     def test_add_new_line(self):
         self.assertEqual(add_new_line(b'sciences'), b'sciences\r\n')
-
-
 
 
 if __name__ == '__main__':

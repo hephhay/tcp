@@ -34,10 +34,10 @@ class ServerProtocol(asyncio.Protocol):
     def get_bytes(self):
         """
         Called to get the memeory mapped file for lookup
-    
+
         Returns:
         bytes: bytes to be looked up
-    
+
         """
 
         return load_file(LINUXPATH)
@@ -50,13 +50,13 @@ class ServerProtocol(asyncio.Protocol):
         try:
             # Check for query overflow
             if (len(message) > MAX_BYTE):
-                raise ValueError('{} {}'\
-                    .format(OVERFLOW_MESSAGE, MAX_BYTE))
+                raise ValueError('{} {}'.format(OVERFLOW_MESSAGE, MAX_BYTE))
 
             # removes null and empty characters from string
             message = message.strip()
-            logging.info('{} Data received: {!r}'\
-                .format(self.peername, message.decode(errors='ignore')))
+            logging.info('{} Data received: {!r}'.format(
+                self.peername,
+                message.decode(errors='ignore')))
 
             if REREAD:
                 found_val = self.get_bytes().find(add_new_line(message))
@@ -69,9 +69,9 @@ class ServerProtocol(asyncio.Protocol):
         except ValueError as err:
             res_message = str(err)
             logging.error(res_message)
-            res_message = ERROR_START+ ': ' + res_message
+            res_message = ERROR_START + ': ' + res_message
 
-        #handle other server errors
+        # handle other server errors
         except Exception:
             res_message = ERROR_MSG
             default_exception()
@@ -79,22 +79,22 @@ class ServerProtocol(asyncio.Protocol):
         finally:
             # add debug messages to response
             res_message += DEBUG_START + debug_message(
-                IP_ADDRESS = self.peername[0],
-                PORT = self.peername[1],
-                EXECUTION_TIME = '{} ms'.format((timer() -start) * 1000),
-                SEARCH_QUERY = message.decode(errors='ignore'),
-                REREAD_ON_QUERY = REREAD,
-                START_TIME = start_time,
-                END_TIME = datetime.now(),
+                IP_ADDRESS=self.peername[0],
+                PORT=self.peername[1],
+                EXECUTION_TIME='{} ms'.format((timer() - start) * 1000),
+                SEARCH_QUERY=message.decode(errors='ignore'),
+                REREAD_ON_QUERY=REREAD,
+                START_TIME=start_time,
+                END_TIME=datetime.now()
             )
 
-            logging.info('{} Sending: {!r}'\
-                .format(self.peername, res_message))
+            logging.info('{} Sending: {!r}'.format(self.peername, res_message))
             self.transport.write(add_new_line(bytes(res_message, ENCODING)))
 
     def connection_lost(self, exc):
         logging.info('{} is disconnnected'.format(self.peername))
         return super().connection_lost(exc)
+
 
 async def serve(ip_address, port):
     """

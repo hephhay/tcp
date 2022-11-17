@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "as_tcp"
+version = "0.0.1"
+authors = [
+  { name="Daniel Farayola", email="faradaydanfard@gmail.com" },
+]
+description = "A highly performant TCP server that searches for queries in file"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "aiorun >= 2021.8.1",
+    "pyserial >= 3.5",
+    "pyserial-asyncio >= 0.6",
+]
+
+
+[project.urls]
+"Homepage" = "https://github.com/hephhay/tcp"

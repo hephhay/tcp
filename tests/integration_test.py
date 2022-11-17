@@ -11,9 +11,9 @@ from timeit import default_timer as timer
 import serial_asyncio
 
 # set package scope to as_tcp
-PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
-sys.path.append(PACKAGE_PATH)
-__package__ = PACKAGE_PATH
+# PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
+# sys.path.append(PACKAGE_PATH)
+# __package__ = PACKAGE_PATH
 
 # Project Modules
 from as_tcp import (
@@ -45,6 +45,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 done = found_str = not_found_str = received = actions = None
 
+
 class TestClientProtocol(asyncio.Protocol):
     """
     Base TestClient to be used for testing
@@ -68,7 +69,7 @@ class TestClientProtocol(asyncio.Protocol):
     def send_data(self):
         """
         Called to get the string to be sent to server
-    
+
         Returns:
         bytes: string to be sent to server
 
@@ -90,6 +91,7 @@ class TestClientProtocol(asyncio.Protocol):
         # Notify Event loop abount connection ended
         done.set()
 
+
 class TestServerProtocol(ServerProtocol):
     def get_bytes(self):
         return load_file(TEST_FILE_PATH)
@@ -99,6 +101,7 @@ class TestServerProtocol(ServerProtocol):
 
         logging.debug('Close the client socket')
         self.transport.close()
+
 
 class IntegrationTestCases(unittest.TestCase):
 
@@ -135,7 +138,7 @@ class IntegrationTestCases(unittest.TestCase):
 
         Parameters:
         output_client (TestClientProtocol): client class for testing
-    
+
         Returns:
         None
 
@@ -178,7 +181,6 @@ class IntegrationTestCases(unittest.TestCase):
                 return input_data
 
         return OuputClient
-
 
     def assert_order(self):
         global REREAD
@@ -248,6 +250,7 @@ class IntegrationTestCases(unittest.TestCase):
         REREAD = False
 
         self.test_reread_overflow_success()
+
 
 snapshot2 = tracemalloc.take_snapshot()
 

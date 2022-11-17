@@ -12,6 +12,7 @@ from .setup import (
     logging
 )
 
+
 def load_file(path):
     """
     loads file from path to memory
@@ -30,6 +31,7 @@ def load_file(path):
         mfile = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
         logging.debug('file mapped to memmory')
         return mfile
+
 
 def hash_file(mfile):
     """
@@ -56,6 +58,7 @@ def hash_file(mfile):
 
     logging.debug('file hashed successfully')
 
+
 def is_empty(word):
     """
     check if byte is null
@@ -70,6 +73,7 @@ def is_empty(word):
 
     return True if word == b'' else False
 
+
 def get_message(value):
     if value < 0:
         logging.debug(NOT_FOUND_MESSAGE)
@@ -78,8 +82,10 @@ def get_message(value):
     logging.debug(FOUND_MESSAGE)
     return FOUND_MESSAGE
 
+
 def add_new_line(word):
     return word + bytes(NEW_LINE, ENCODING)
+
 
 def debug_message(**kwargs):
     """
@@ -101,6 +107,7 @@ def debug_message(**kwargs):
     logging.debug(debug_str)
     return debug_str
 
+
 def default_exception():
     """
     gracefull handling and logging of exceptions
@@ -120,8 +127,8 @@ def default_exception():
     stack_trace = list()
 
     for trace in trace_back:
-        stack_trace.append('File : {} , Line : {}, Func.Name : {}, Message : {}'\
-            .format(trace[0], trace[1], trace[2], trace[3]))
+        stack_trace.append('File : {} , Line : {}, \
+            Func.Name : {}, Message : {}'.format(*trace))
 
     logging.error('Exception type : {}'.format(ex_type.__name__))
     logging.error('Exception message : {}'.format(ex_value))

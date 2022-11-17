@@ -2,7 +2,7 @@ import configparser
 import logging
 from collections import defaultdict
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -12,7 +12,7 @@ REREAD = config['DEFAULT'].getboolean('REREAD_ON_QUERY')
 IP_ADRESS = config['DEFAULT'].get('IP_ADDRESS')
 PORT = config['DEFAULT'].getint('PORT')
 
-HASHMAP = defaultdict(lambda : -1)
+HASHMAP = defaultdict(lambda: -1)
 NEW_LINE = '\r\n'
 ENCODING = 'utf-8'
 MAX_BYTE = 1024
