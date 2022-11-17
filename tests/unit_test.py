@@ -1,14 +1,7 @@
 import configparser
 import io
 import mmap
-import pathlib
-import sys
 import unittest
-
-# set package scope to as_tcp
-# PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
-# sys.path.append(PACKAGE_PATH)
-# __package__ = PACKAGE_PATH
 
 # Project Modules
 from as_tcp import (

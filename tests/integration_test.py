@@ -1,19 +1,11 @@
 import configparser
 import logging
-import pathlib
-import sys
 import unittest
 import asyncio
 import tracemalloc
-from timeit import default_timer as timer
 
 # third party libraries
 import serial_asyncio
-
-# set package scope to as_tcp
-# PACKAGE_PATH = str(pathlib.Path(sys.argv[0]).absolute().parent.parent)
-# sys.path.append(PACKAGE_PATH)
-# __package__ = PACKAGE_PATH
 
 # Project Modules
 from as_tcp import (
