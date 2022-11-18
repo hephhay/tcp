@@ -12,4 +12,7 @@ if __name__ == '__main__':
     if not REREAD:
         m_file = load_file(FILEPATH)
         hash_file(m_file)
-    run(serve(IP_ADRESS, PORT))
+
+    # start server deamon
+        with daemon.DaemonContext():
+            run(serve(IP_ADRESS, PORT))
