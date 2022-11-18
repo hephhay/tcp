@@ -35,6 +35,8 @@ REREAD = config['DEFAULT'].getboolean('REREAD_ON_QUERY')
 IP_ADRESS = config['DEFAULT'].get('IP_ADDRESS')
 PORT = config['DEFAULT'].getint('PORT')
 
+TEST_STRING = config['TEST'].get('TEST_STRING').encode()
+
 # check if linux path configuration is absolute or relative
 if path.exists(LINUXPATH):
     FILEPATH = LINUXPATH

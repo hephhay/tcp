@@ -18,6 +18,7 @@ from as_tcp import (
     load_file,
     logger
 )
+from as_tcp.client import ClientProtocol
 from as_tcp.setup import BASE_DIR
 
 INI_FILE = 'config.ini'
@@ -51,39 +52,17 @@ CONN_STRING = 'socket://{}:{}'.format(IP_ADRESS, str(PORT))
 done = found_str = not_found_str = received = actions = None
 
 
-class TestClientProtocol(asyncio.Protocol):
-    """
-    Base TestClient to be used for testing
-    """
-
-    def __init__(self):
-        super().__init__()
-        self.transport = None
+class TestClientProtocol(ClientProtocol):
 
     def connection_made(self, transport):
-        self.transport = transport
-
-        # Send data to server
-        data = self.send_data()
-        transport.write(data)
-        logger.debug('Data sent: {!r}'.format(data))
+        super().connection_made(transport)
 
         # sets the current action to opened connection
         actions.append('open')
 
-    def send_data(self):
-        """
-        Called to get the string to be sent to server
-
-        Returns:
-        bytes: string to be sent to server
-
-        """
-
-        pass
-
     def data_received(self, data):
-        logger.debug('Data received: {!r}'.format(data.decode()))
+        super().data_received(data)
+
         global received
         received = data
 

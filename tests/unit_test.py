@@ -41,8 +41,11 @@ else:
 
 
 class UnitTestCases(unittest.TestCase):
+
     def setUp(self):
         self.file_path = TEST_FILE_PATH
+        HASHMAP.clear()
+
         return super().setUp()
 
     """
@@ -82,8 +85,10 @@ class UnitTestCases(unittest.TestCase):
         """test for illegal value"""
         self.assertEqual(HASHMAP[b'illegal value'], -1)
 
-        """clear hash map"""
+    def tearDown(self):
         HASHMAP.clear()
+
+        return super().tearDown()
 
     """
     Test is empty function
