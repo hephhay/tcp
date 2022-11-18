@@ -2,3 +2,5 @@ __pycache__/
 .vscode/
 build/
 *.egg-info/
+*.log
+*.logs

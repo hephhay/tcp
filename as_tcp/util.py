@@ -9,7 +9,7 @@ from .setup import (
     HASHMAP,
     NEW_LINE,
     NOT_FOUND_MESSAGE,
-    logging
+    logger,
 )
 
 
@@ -26,10 +26,10 @@ def load_file(path):
     """
 
     with open(path, "r+b") as f:
-        logging.debug('file opened successfully')
+        logger.debug('file opened successfully')
         # memory-map the file, size 0 means whole file and return
         mfile = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
-        logging.debug('file mapped to memmory')
+        logger.debug('file mapped to memmory')
         return mfile
 
 
@@ -45,7 +45,7 @@ def hash_file(mfile):
 
     """
 
-    logging.debug('started hashing file')
+    logger.debug('started hashing file')
 
     while True:
         line = mfile.readline()
@@ -56,7 +56,7 @@ def hash_file(mfile):
             continue
         HASHMAP[line] = 1
 
-    logging.debug('file hashed successfully')
+    logger.debug('file hashed successfully')
 
 
 def is_empty(word):
@@ -76,10 +76,10 @@ def is_empty(word):
 
 def get_message(value):
     if value < 0:
-        logging.debug(NOT_FOUND_MESSAGE)
+        logger.debug(NOT_FOUND_MESSAGE)
         return NOT_FOUND_MESSAGE
 
-    logging.debug(FOUND_MESSAGE)
+    logger.debug(FOUND_MESSAGE)
     return FOUND_MESSAGE
 
 
@@ -104,13 +104,13 @@ def debug_message(**kwargs):
     for key, value in kwargs.items():
         debug_str += '\t {}: {}{}'.format(key, value, NEW_LINE)
 
-    logging.debug(debug_str)
+    logger.debug(debug_str)
     return debug_str
 
 
 def default_exception():
     """
-    gracefull handling and logging of exceptions
+    gracefull handling and logger of exceptions
 
     Returns:
     None
@@ -130,6 +130,6 @@ def default_exception():
         stack_trace.append('File : {} , Line : {}, \
             Func.Name : {}, Message : {}'.format(*trace))
 
-    logging.error('Exception type : {}'.format(ex_type.__name__))
-    logging.error('Exception message : {}'.format(ex_value))
-    logging.error('Stack trace : {}'.format(stack_trace))
+    logger.error('Exception type : {}'.format(ex_type.__name__))
+    logger.error('Exception message : {}'.format(ex_value))
+    logger.error('Stack trace : {}'.format(stack_trace))

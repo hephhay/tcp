@@ -5,9 +5,11 @@ import daemon
 
 # Project Modules
 from .server import serve
-from .setup import IP_ADRESS, PORT
-
-print(__name__)
+from .setup import IP_ADRESS, PORT, REREAD, FILEPATH
+from .util import load_file, hash_file
 
 if __name__ == '__main__':
+    if not REREAD:
+        m_file = load_file(FILEPATH)
+        hash_file(m_file)
     run(serve(IP_ADRESS, PORT))

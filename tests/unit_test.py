@@ -1,6 +1,8 @@
 import configparser
 import io
+import logging
 import mmap
+from os import path
 import unittest
 
 # Project Modules
@@ -13,15 +15,29 @@ from as_tcp import (
     get_message,
     NOT_FOUND_MESSAGE,
     FOUND_MESSAGE,
-    logging
+    logger
 )
+from as_tcp.setup import BASE_DIR
 
-logging.basicConfig(level=logging.DEBUG)
+INI_FILE = 'config.ini'
+
+logger.setLevel(logging.DEBUG)
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(BASE_DIR / INI_FILE)
 
-TEST_FILE_PATH = config['TEST'].get('filepath')
+LINUXPATH = config['TEST'].get('LINUXPATH')
+
+# check if linux path configuration is absolute or relative
+if path.exists(LINUXPATH):
+    TEST_FILE_PATH = LINUXPATH
+elif path.exists(BASE_DIR / LINUXPATH):
+    TEST_FILE_PATH = BASE_DIR / LINUXPATH
+else:
+    raise FileNotFoundError('{!r} does not exist \
+        please edit "LINUXPATH" in {!r}'.format(
+            LINUXPATH,
+            BASE_DIR / 'config.ini'))
 
 
 class UnitTestCases(unittest.TestCase):

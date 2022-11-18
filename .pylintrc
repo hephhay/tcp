@@ -282,15 +282,15 @@ missing-member-max-choices=1
 signature-mutators=
 
 
-[LOGGING]
+[logger]
 
-# Format style used to check logging format string. `old` means using %
+# Format style used to check logger format string. `old` means using %
 # formatting, `new` is for `{}` formatting,and `fstr` is for f-strings.
-logging-format-style=old
+logger-format-style=old
 
-# Logging modules to check that the string format arguments are in logging
+# logger modules to check that the string format arguments are in logger
 # function parameter format.
-logging-modules=logging
+logger-modules=logger
 
 
 [BASIC]

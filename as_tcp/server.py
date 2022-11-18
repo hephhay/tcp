@@ -4,13 +4,13 @@ from timeit import default_timer as timer
 
 # Project Modules
 from .setup import (
-    logging,
+    logger,
     DEBUG_START,
     ENCODING,
     ERROR_MSG,
     ERROR_START,
     HASHMAP,
-    LINUXPATH,
+    FILEPATH,
     MAX_BYTE,
     OVERFLOW_MESSAGE,
     REREAD
@@ -20,7 +20,6 @@ from .util import (
     debug_message,
     default_exception,
     get_message,
-    hash_file,
     load_file
 )
 
@@ -28,7 +27,7 @@ from .util import (
 class ServerProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         self.peername = transport.get_extra_info('peername')
-        logging.info('Connection from {}'.format(self.peername))
+        logger.info('Connection from {}'.format(self.peername))
         self.transport = transport
 
     def get_bytes(self):
@@ -40,7 +39,7 @@ class ServerProtocol(asyncio.Protocol):
 
         """
 
-        return load_file(LINUXPATH)
+        return load_file(FILEPATH)
 
     def data_received(self, data):
         start = timer()
@@ -54,7 +53,7 @@ class ServerProtocol(asyncio.Protocol):
 
             # removes null and empty characters from string
             message = message.strip()
-            logging.info('{} Data received: {!r}'.format(
+            logger.info('{} Data received: {!r}'.format(
                 self.peername,
                 message.decode(errors='ignore')))
 
@@ -68,7 +67,7 @@ class ServerProtocol(asyncio.Protocol):
         # handle overflow exeption
         except ValueError as err:
             res_message = str(err)
-            logging.error(res_message)
+            logger.error(res_message)
             res_message = ERROR_START + ': ' + res_message
 
         # handle other server errors
@@ -88,11 +87,11 @@ class ServerProtocol(asyncio.Protocol):
                 END_TIME=datetime.now()
             )
 
-            logging.info('{} Sending: {!r}'.format(self.peername, res_message))
+            logger.info('{} Sending: {!r}'.format(self.peername, res_message))
             self.transport.write(add_new_line(bytes(res_message, ENCODING)))
 
     def connection_lost(self, exc):
-        logging.info('{} is disconnnected'.format(self.peername))
+        logger.info('{} is disconnnected'.format(self.peername))
         return super().connection_lost(exc)
 
 
@@ -109,10 +108,6 @@ async def serve(ip_address, port):
 
     """
 
-    if not REREAD:
-        m_file = load_file(LINUXPATH)
-        hash_file(m_file)
-
     # Get a reference to the event loop as we plan to use
     # low-level APIs.
     loop = asyncio.get_running_loop()
@@ -122,7 +117,7 @@ async def serve(ip_address, port):
         ip_address, port)
 
     addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-    logging.info(f'Serving on {addrs}')
+    logger.info(f'Serving on {addrs}')
 
     async with server:
         await server.serve_forever()

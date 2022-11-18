@@ -1,4 +1,5 @@
 import configparser
+from os import path
 import logging
 import unittest
 import asyncio
@@ -15,25 +16,37 @@ from as_tcp import (
     REREAD,
     hash_file,
     load_file,
-    logging
+    logger
 )
+from as_tcp.setup import BASE_DIR
 
-logging.basicConfig(level=logging.DEBUG)
+INI_FILE = 'config.ini'
+
+logger.setLevel(logging.DEBUG)
 
 # track memory allocaton
 tracemalloc.start()
 snapshot1 = tracemalloc.take_snapshot()
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(BASE_DIR / INI_FILE)
 
-TEST_FILE_PATH = config['TEST'].get('filepath')
+LINUXPATH = config['TEST'].get('LINUXPATH')
 IP_ADRESS = config['TEST'].get('IP_ADDRESS')
 PORT = config['TEST'].getint('PORT')
 
-CONN_STRING = 'socket://{}:{}'.format(IP_ADRESS, str(PORT))
+# check if linux path configuration is absolute or relative
+if path.exists(LINUXPATH):
+    TEST_FILE_PATH = LINUXPATH
+elif path.exists(BASE_DIR / LINUXPATH):
+    TEST_FILE_PATH = BASE_DIR / LINUXPATH
+else:
+    raise FileNotFoundError('{!r} does not exist \
+        please edit "LINUXPATH" in {!r}'.format(
+            LINUXPATH,
+            BASE_DIR / INI_FILE))
 
-logging.basicConfig(level=logging.DEBUG)
+CONN_STRING = 'socket://{}:{}'.format(IP_ADRESS, str(PORT))
 
 done = found_str = not_found_str = received = actions = None
 
@@ -53,7 +66,7 @@ class TestClientProtocol(asyncio.Protocol):
         # Send data to server
         data = self.send_data()
         transport.write(data)
-        logging.debug('Data sent: {!r}'.format(data))
+        logger.debug('Data sent: {!r}'.format(data))
 
         # sets the current action to opened connection
         actions.append('open')
@@ -70,12 +83,12 @@ class TestClientProtocol(asyncio.Protocol):
         pass
 
     def data_received(self, data):
-        logging.debug('Data received: {!r}'.format(data.decode()))
+        logger.debug('Data received: {!r}'.format(data.decode()))
         global received
         received = data
 
     def connection_lost(self, exc):
-        logging.debug('The server closed the connection')
+        logger.debug('The server closed the connection')
 
         # sets the current action to closed
         actions.append('close')
@@ -91,7 +104,7 @@ class TestServerProtocol(ServerProtocol):
     def data_received(self, data):
         super().data_received(data)
 
-        logging.debug('Close the client socket')
+        logger.debug('Close the client socket')
         self.transport.close()
 
 
@@ -251,7 +264,7 @@ top_stats = snapshot2.compare_to(snapshot1, 'lineno')
 
 # Top 10 diffrences
 for stat in top_stats[:10]:
-    logging.warning(stat)
+    logger.warning(stat)
 
 if __name__ == '__main__':
     unittest.main()
