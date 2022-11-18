@@ -53,7 +53,7 @@ class ServerProtocol(asyncio.Protocol):
 
             # removes null and empty characters from string
             message = message.strip()
-            logger.info('{} Data received: {!r}'.format(
+            logger.debug('{} Data received: {!r}'.format(
                 self.peername,
                 message.decode(errors='ignore')))
 
@@ -87,7 +87,7 @@ class ServerProtocol(asyncio.Protocol):
                 END_TIME=datetime.now()
             )
 
-            logger.info('{} Sending: {!r}'.format(self.peername, res_message))
+            logger.debug('{} Sending: {!r}'.format(self.peername, res_message))
             self.transport.write(add_new_line(bytes(res_message, ENCODING)))
 
     def connection_lost(self, exc):

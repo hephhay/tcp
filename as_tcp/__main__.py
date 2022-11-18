@@ -5,7 +5,14 @@ import daemon
 
 # Project Modules
 from .server import serve
-from .setup import IP_ADRESS, PORT, REREAD, FILEPATH, logger
+from .setup import (
+    IP_ADRESS,
+    PORT,
+    REREAD,
+    FILEPATH,
+    logger,
+    stdout_handler
+)
 from .util import load_file, hash_file
 
 if __name__ == '__main__':
@@ -14,6 +21,7 @@ if __name__ == '__main__':
         hash_file(m_file)
 
     logger.info('Serving on {}'.format((IP_ADRESS, PORT)))
+    logger.removeHandler(stdout_handler)
 
     # start server deamon
     with daemon.DaemonContext():

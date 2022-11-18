@@ -10,8 +10,9 @@ MAX_BYTE = 1024
 BASE_DIR = Path(__file__).resolve().parent
 INI_FILE = 'config.ini'
 
+# setup logger
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
 
 file_handler = RotatingFileHandler(
