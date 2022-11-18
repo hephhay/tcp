@@ -117,7 +117,7 @@ async def serve(ip_address, port):
         ip_address, port)
 
     addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-    logger.info(f'Serving on {addrs}')
+    logger.info('Serving on {}'.format(str(addrs)))
 
     async with server:
         await server.serve_forever()
