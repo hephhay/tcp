@@ -1,5 +1,4 @@
 aiorun==2022.11.1
-as_tcp @ file:///home/hephhay/Documents/Python/tcp
 attrs==22.1.0
 build==0.9.0
 docutils==0.19
