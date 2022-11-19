@@ -41,6 +41,9 @@ else:
 
 
 class UnitTestCases(unittest.TestCase):
+    """
+    Tests every single utility function
+    """
 
     def setUp(self):
         self.file_path = TEST_FILE_PATH

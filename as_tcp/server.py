@@ -25,6 +25,10 @@ from .util import (
 
 
 class ServerProtocol(asyncio.Protocol):
+    """
+    Base Server protocol implementation for as_tcp
+    """
+
     def connection_made(self, transport):
         self.peername = transport.get_extra_info('peername')
         logger.info('Connection from {}'.format(self.peername))

@@ -12,13 +12,12 @@ import serial_asyncio
 from as_tcp import (
     FOUND_MESSAGE,
     NOT_FOUND_MESSAGE,
-    ServerProtocol,
     REREAD,
     hash_file,
     load_file,
     logger
 )
-from as_tcp.client import ClientProtocol
+from as_tcp.client import ClientTestServerProtocol
 from as_tcp.setup import BASE_DIR
 
 INI_FILE = 'config.ini'
@@ -52,16 +51,35 @@ CONN_STRING = 'socket://{}:{}'.format(IP_ADRESS, str(PORT))
 done = found_str = not_found_str = received = actions = None
 
 
-class TestClientProtocol(ClientProtocol):
+class TestClientProtocol(asyncio.Protocol):
+    """
+    Base Client to be used for testing
+    """
 
     def connection_made(self, transport):
-        super().connection_made(transport)
+        self.transport = transport
+
+        # Send data to server
+        data = self.send_data()
+        transport.write(data)
+        logger.debug('Data sent: {!r}'.format(data))
 
         # sets the current action to opened connection
         actions.append('open')
 
+    def send_data(self):
+        """
+        Called to get the string to be sent to server
+
+        Returns:
+        bytes: string to be sent to server
+
+        """
+
+        return b''
+
     def data_received(self, data):
-        super().data_received(data)
+        logger.debug('Data received: {!r}'.format(data.decode()))
 
         global received
         received = data
@@ -76,18 +94,19 @@ class TestClientProtocol(ClientProtocol):
         done.set()
 
 
-class TestServerProtocol(ServerProtocol):
+class TestServerProtocol(ClientTestServerProtocol):
+    """
+    Just like direct parent but gets bytes from test configuration
+    """
+
     def get_bytes(self):
         return load_file(TEST_FILE_PATH)
 
-    def data_received(self, data):
-        super().data_received(data)
-
-        logger.debug('Close the client socket')
-        self.transport.close()
-
 
 class IntegrationTestCases(unittest.TestCase):
+    """
+    Tests every single non error server cases
+    """
 
     def setUp(self):
         self.loop = asyncio.get_event_loop()
