@@ -29,19 +29,25 @@ class ClientTestServerProtocol(ServerProtocol):
     """
     Client specific Server shuts down after every message
     """
+    def connection_made(self, transport):
+        # start timer
+        global START
+        START = timer()
+
+        super().connection_made(transport)
 
     def get_bytes(self):
         return load_file(FILEPATH)
 
     def data_received(self, data):
-        # start timer
-        START = timer()
 
         super().data_received(data)
 
         logger.debug('Close the client socket')
         self.transport.close()
-        
+
+    def connection_lost(self, exc):
+        super().connection_lost(exc)
         logger.info('roundtrip takes {} ms'.format((timer() - START) * 1000))
 
 

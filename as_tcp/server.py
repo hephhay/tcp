@@ -96,7 +96,7 @@ class ServerProtocol(asyncio.Protocol):
 
     def connection_lost(self, exc):
         logger.info('{} is disconnnected'.format(self.peername))
-        return super().connection_lost(exc)
+        super().connection_lost(exc)
 
 
 async def serve(ip_address, port):
