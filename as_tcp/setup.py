@@ -17,7 +17,7 @@ formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
 
 file_handler = RotatingFileHandler(
     BASE_DIR / 'logs.log',
-    maxBytes=MAX_BYTE * MAX_BYTE
+    maxBytes=MAX_BYTE + MAX_BYTE
 )
 file_handler.setFormatter(formatter)
 
